@@ -1,20 +1,21 @@
 package com.ajai.interpreter.token;
 
-public enum Token {
+public class Token {
 
-  INTEGER("INTEGER"), PLUS("PLUS"), EOF("EOF");
+  private final TokenType type;
+  private final Character currentChar;
 
-  private String type;
-
-  private Token(String type) {
+  public Token(TokenType type, Character currentChar) {
     this.type = type;
+    this.currentChar = currentChar;
   }
 
-  public String getType() {
-    return this.getType();
+  public TokenType getType() {
+    return type;
   }
 
-  public Token getToken(String type) {
-    return Token.valueOf(type);
+  public Character getCurrentChar() {
+    return currentChar;
   }
+
 }
