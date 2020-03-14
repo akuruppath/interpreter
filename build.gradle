@@ -1,5 +1,4 @@
 
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'jacoco'
@@ -27,9 +26,13 @@ dependencies {
     testCompile 'org.mockito:mockito-junit-jupiter:3.3.0'
     testCompile 'org.mockito:mockito-core:3.3.0'
     
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.5.2'
+    
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.6.0'
+    testImplementation 'org.junit.platform:junit-platform-runner:1.6.0'
+    
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
     
 }
 
