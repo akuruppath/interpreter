@@ -3,19 +3,24 @@ package com.ajai.interpreter.token;
 public class Token {
 
   private final TokenType type;
-  private final Character currentChar;
+  private final String value;
 
-  public Token(TokenType type, Character currentChar) {
+  public Token(TokenType type, String value) {
     this.type = type;
-    this.currentChar = currentChar;
+    this.value = value;
   }
 
   public TokenType getType() {
     return type;
   }
 
-  public Character getCurrentChar() {
-    return currentChar;
+  public String get() {
+    return value;
+  }
+
+  public String toString() {
+    return new StringBuilder().append("Token").append("{").append(type).append("}").append("{")
+        .append(value).append("}").toString();
   }
 
 }

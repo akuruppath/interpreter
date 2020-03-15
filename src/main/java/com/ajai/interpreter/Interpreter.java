@@ -1,7 +1,11 @@
 package com.ajai.interpreter;
 
-import java.text.CharacterIterator;
+import static java.text.CharacterIterator.DONE;
+import static java.lang.Character.isDigit;
+import static java.lang.Character.isWhitespace;
+
 import java.text.StringCharacterIterator;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -10,6 +14,8 @@ import com.ajai.interpreter.token.TokenType;
 
 public class Interpreter {
 
+  private static final String MINUS_OPERATOR = "-";
+  private static final String PLUS_OPERATOR = "+";
   private Token currentToken;
   private StringCharacterIterator charIterator;
 
@@ -20,44 +26,70 @@ public class Interpreter {
   public IntSupplier getResult() {
     return expressionResult;
   }
-  
-  
+
+
   public static class InterpreterBuilder {
-    
+
     private final String text;
-    
+
     public InterpreterBuilder(String text) {
       this.text = text;
     }
-    
+
     public Interpreter build() {
       return new Interpreter(text);
     }
   }
-  
+
+  WhiteSpaceSkipper whiteSpace = () -> {
+
+    while (charIterator.current() != DONE && isWhitespace(charIterator.current())) {
+      charIterator.next();
+    }
+  };
+
+  Supplier<String> numberRepresentation = () -> {
+
+    StringBuilder builder = new StringBuilder();
+
+    while (charIterator.current() != DONE && isDigit(charIterator.current())) {
+      builder.append(charIterator.current());
+      charIterator.next();
+    }
+
+    return builder.toString();
+  };
+
   Supplier<Token> nextToken = () -> {
 
-    if(charIterator.current() == CharacterIterator.DONE) {
-      return new Token(TokenType.EOF, null);
+    while (charIterator.current() != DONE) {
+
+      if (isWhitespace(charIterator.current())) {
+        whiteSpace.skip();
+        continue;
+      }
+
+      if (isDigit(charIterator.current())) {
+        return new Token(TokenType.INTEGER, numberRepresentation.get());
+      }
+
+      if (charIterator.current() == '+') {
+        charIterator.next();
+        return new Token(TokenType.PLUS, PLUS_OPERATOR);
+      }
+
+      if (charIterator.current() == '-') {
+        charIterator.next();
+        return new Token(TokenType.MINUS, MINUS_OPERATOR);
+      }
+      throw new IllegalStateException("Received unexpected token [" + charIterator.current() + "]");
+
     }
 
-    Character currentChar = charIterator.current();
-
-
-    if (Character.isDigit(currentChar)) {
-      charIterator.next();
-      return new Token(TokenType.INTEGER, currentChar);
-    }
-
-    else if (currentChar == '+') {
-      charIterator.next();
-      return new Token(TokenType.PLUS, currentChar);
-    }
-
-    throw new IllegalStateException("Received unexpected token [" + currentChar + "]");
+    return new Token(TokenType.EOF, null);
 
   };
-  
+
 
   Consumer<TokenType> consumeToken = type -> {
     if (currentToken.getType() == type) {
@@ -68,28 +100,29 @@ public class Interpreter {
   };
 
 
-
   IntSupplier expressionResult = () -> {
 
     currentToken = nextToken.get();
 
-    Character left = currentToken.getCurrentChar();
+    String left = currentToken.get();
     consumeToken.accept(TokenType.INTEGER);
 
-    Character op = currentToken.getCurrentChar();
-    consumeToken.accept(TokenType.PLUS);
+    String operator = currentToken.get();
+    consumeToken.accept(Objects.equals(operator, PLUS_OPERATOR) ? TokenType.PLUS : TokenType.MINUS);
 
-    Character right = currentToken.getCurrentChar();
+    String right = currentToken.get();
     consumeToken.accept(TokenType.INTEGER);
 
-    switch (op) {
+    Integer leftOperand = Integer.parseInt(left);
+    Integer rightOperand = Integer.parseInt(right);
 
-      case '+':
-        return Character.getNumericValue(left) + Character.getNumericValue(right);
-    }
-
-    throw new IllegalStateException("Encountered invalid operator [" + op + "]");
-
+    return Objects.equals(operator, PLUS_OPERATOR) ? leftOperand + rightOperand
+        : leftOperand - rightOperand;
   };
+
+  @FunctionalInterface
+  interface WhiteSpaceSkipper {
+    void skip();
+  }
 
 }
