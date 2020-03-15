@@ -1,5 +1,7 @@
 package com.ajai.interpreter;
 
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -8,31 +10,30 @@ import com.ajai.interpreter.token.TokenType;
 
 public class Interpreter {
 
-  private String text;
-  private int position;
   private Token currentToken;
+  private StringCharacterIterator charIterator;
 
   public Interpreter(String text) {
-    this.text = text;
+    charIterator = new StringCharacterIterator(text);
   }
 
 
   Supplier<Token> nextToken = () -> {
 
-    if (position > this.text.length() - 1) {
+    if(charIterator.current() == CharacterIterator.DONE) {
       return new Token(TokenType.EOF, null);
     }
 
-    Character currentChar = this.text.charAt(position);
+    Character currentChar = charIterator.current();
 
 
     if (Character.isDigit(currentChar)) {
-      position++;
+      charIterator.next();
       return new Token(TokenType.INTEGER, currentChar);
     }
 
     else if (currentChar == '+') {
-      position++;
+      charIterator.next();
       return new Token(TokenType.PLUS, currentChar);
     }
 
