@@ -13,11 +13,28 @@ public class Interpreter {
   private Token currentToken;
   private StringCharacterIterator charIterator;
 
-  public Interpreter(String text) {
+  private Interpreter(String text) {
     charIterator = new StringCharacterIterator(text);
   }
 
-
+  public IntSupplier getResult() {
+    return expressionResult;
+  }
+  
+  
+  public static class InterpreterBuilder {
+    
+    private final String text;
+    
+    public InterpreterBuilder(String text) {
+      this.text = text;
+    }
+    
+    public Interpreter build() {
+      return new Interpreter(text);
+    }
+  }
+  
   Supplier<Token> nextToken = () -> {
 
     if(charIterator.current() == CharacterIterator.DONE) {
@@ -40,6 +57,7 @@ public class Interpreter {
     throw new IllegalStateException("Received unexpected token [" + currentChar + "]");
 
   };
+  
 
   Consumer<TokenType> consumeToken = type -> {
     if (currentToken.getType() == type) {
@@ -51,7 +69,7 @@ public class Interpreter {
 
 
 
-  public IntSupplier expression = () -> {
+  IntSupplier expressionResult = () -> {
 
     currentToken = nextToken.get();
 
