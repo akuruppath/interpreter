@@ -40,12 +40,29 @@ class InterpreterTest {
     assertEquals(1, new InterpreterBuilder("3- 2").build().getResult().getAsInt());
 
     assertEquals(18, new InterpreterBuilder("14 + 4").build().getResult().getAsInt());
+    
   }
 
   @Test
   void testExpressionWithNonPlusOrMinusOperator() {
     assertThrows(IllegalStateException.class,
         () -> new InterpreterBuilder("1%2").build().getResult().getAsInt());
+  }
+
+  @Test
+  void testExpressionWithOneOperand() {
+    assertThrows(IllegalStateException.class,
+        () -> new InterpreterBuilder("14 + ").build().getResult().getAsInt());
+    
+    assertThrows(IllegalStateException.class,
+        () -> new InterpreterBuilder(" + 3").build().getResult().getAsInt());
+    
+  }
+  
+  @Test
+  void testExpressionWithJustOperator() {
+    assertThrows(IllegalStateException.class,
+        () -> new InterpreterBuilder("+").build().getResult().getAsInt());
   }
 
 }

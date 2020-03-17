@@ -96,7 +96,7 @@ public class Interpreter {
     if (currentToken.getType() == type) {
       currentToken = nextToken.get();
     } else {
-      throw new IllegalStateException("Received unexpected token of type [" + type + "]");
+      throw new IllegalStateException("Received unexpected token of type [" + currentToken.getType() + "]");
     }
   };
 
