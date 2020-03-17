@@ -1,5 +1,9 @@
 package com.ajai.interpreter;
 
+import static com.ajai.interpreter.operators.Operator.DIVISION;
+import static com.ajai.interpreter.operators.Operator.MINUS;
+import static com.ajai.interpreter.operators.Operator.MULTIPLICATION;
+import static com.ajai.interpreter.operators.Operator.PLUS;
 import static com.ajai.interpreter.operators.Operator.getOperator;
 import static java.lang.Character.isDigit;
 import static java.lang.Character.isWhitespace;
@@ -17,7 +21,7 @@ import com.ajai.interpreter.token.TokenType;
 public class Interpreter {
 
   private static final Set<Operator> OPERATOR_SET =
-      EnumSet.of(Operator.PLUS, Operator.MINUS, Operator.MULTIPLICATION, Operator.DIVISION);
+      EnumSet.of(PLUS, MINUS, MULTIPLICATION, DIVISION);
 
   private Token currentToken;
   private StringCharacterIterator charIterator;
@@ -44,13 +48,13 @@ public class Interpreter {
     }
   }
 
-  WhiteSpaceSkip skipper = () -> {
+  private SkipWhiteSpace skipper = () -> {
     while (charIterator.current() != DONE && isWhitespace(charIterator.current())) {
       charIterator.next();
     }
   };
 
-  private Supplier<String> numberRepresentation = () -> {
+  private Supplier<String> numberToken = () -> {
 
     StringBuilder builder = new StringBuilder();
 
@@ -72,27 +76,27 @@ public class Interpreter {
       }
 
       if (isDigit(charIterator.current())) {
-        return new Token(TokenType.INTEGER, numberRepresentation.get());
+        return new Token(TokenType.INTEGER, numberToken.get());
       }
 
       if (charIterator.current() == '+') {
         charIterator.next();
-        return new Token(TokenType.PLUS, Operator.PLUS.getSymbol());
+        return new Token(TokenType.PLUS, PLUS.getSymbol());
       }
 
       if (charIterator.current() == '-') {
         charIterator.next();
-        return new Token(TokenType.MINUS, Operator.MINUS.getSymbol());
+        return new Token(TokenType.MINUS, MINUS.getSymbol());
       }
 
       if (charIterator.current() == '*') {
         charIterator.next();
-        return new Token(TokenType.MULTIPLICATION, Operator.MULTIPLICATION.getSymbol());
+        return new Token(TokenType.MULTIPLICATION, MULTIPLICATION.getSymbol());
       }
 
       if (charIterator.current() == '/') {
         charIterator.next();
-        return new Token(TokenType.DIVISION, Operator.DIVISION.getSymbol());
+        return new Token(TokenType.DIVISION, DIVISION.getSymbol());
       }
 
       throw new IllegalStateException("Received unexpected token [" + charIterator.current() + "]");
@@ -118,18 +122,16 @@ public class Interpreter {
 
     currentToken = nextToken.get();
 
-    String left = currentToken.get();
+    String firstOperand = currentToken.get();
     consumeToken.accept(TokenType.INTEGER);
 
-    Integer result = Integer.parseInt(left);
+    Integer result = Integer.parseInt(firstOperand);
 
     try {
 
       while (OPERATOR_SET.contains(getOperator(currentToken.get()))) {
 
-        Operator operator = getOperator(currentToken.get());
-
-        switch (operator) {
+        switch (getOperator(currentToken.get())) {
 
           case PLUS:
             consumeToken.accept(TokenType.PLUS);
@@ -170,7 +172,7 @@ public class Interpreter {
 
 
   @FunctionalInterface
-  interface WhiteSpaceSkip {
+  interface SkipWhiteSpace {
     void skip();
   }
 
