@@ -4,20 +4,18 @@ import static java.lang.Character.isDigit;
 import static java.lang.Character.isWhitespace;
 import static java.text.CharacterIterator.DONE;
 import java.text.StringCharacterIterator;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
+import com.ajai.interpreter.operators.Operator;
 import com.ajai.interpreter.token.Token;
 import com.ajai.interpreter.token.TokenType;
-import com.google.common.collect.Sets;
 
 public class Interpreter {
 
-  private static final String MINUS_OPERATOR = "-";
-  private static final String PLUS_OPERATOR = "+";
-
-  private static final Set<String> OPERATOR_SET = Sets.newHashSet(PLUS_OPERATOR, MINUS_OPERATOR);
+  private static final Set<Operator> OPERATOR_SET = EnumSet.of(Operator.PLUS, Operator.MINUS);
 
   private Token currentToken;
   private StringCharacterIterator charIterator;
@@ -77,12 +75,12 @@ public class Interpreter {
 
       if (charIterator.current() == '+') {
         charIterator.next();
-        return new Token(TokenType.PLUS, PLUS_OPERATOR);
+        return new Token(TokenType.PLUS, Operator.PLUS.getSymbol());
       }
 
       if (charIterator.current() == '-') {
         charIterator.next();
-        return new Token(TokenType.MINUS, MINUS_OPERATOR);
+        return new Token(TokenType.MINUS, Operator.MINUS.getSymbol());
       }
       throw new IllegalStateException("Received unexpected token [" + charIterator.current() + "]");
 
@@ -114,16 +112,18 @@ public class Interpreter {
 
     try {
 
-      while (OPERATOR_SET.contains(currentToken.get())) {
+      while (OPERATOR_SET.contains(Operator.getOperator(currentToken.get()))) {
 
-        if (currentToken.get().equals(PLUS_OPERATOR)) {
+        Operator operator = Operator.getOperator(currentToken.get());
+
+        if (operator == Operator.PLUS) {
           consumeToken.accept(TokenType.PLUS);
           String number = currentToken.get();
           consumeToken.accept(TokenType.INTEGER);
           result += Integer.parseInt(number);
         }
 
-        else if (currentToken.get().equals(MINUS_OPERATOR)) {
+        else if (operator == Operator.MINUS) {
           consumeToken.accept(TokenType.MINUS);
           String number = currentToken.get();
           consumeToken.accept(TokenType.INTEGER);
