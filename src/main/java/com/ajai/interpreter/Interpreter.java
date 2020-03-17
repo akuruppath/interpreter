@@ -117,15 +117,17 @@ public class Interpreter {
     }
   };
 
+  private IntSupplier term = () -> {
+
+    String operand = currentToken.get();
+    consumeToken.accept(TokenType.INTEGER);
+    return Integer.parseInt(operand);
+  };
 
   private IntSupplier expressionResult = () -> {
 
     currentToken = nextToken.get();
-
-    String firstOperand = currentToken.get();
-    consumeToken.accept(TokenType.INTEGER);
-
-    Integer result = Integer.parseInt(firstOperand);
+    Integer result = term.getAsInt();
 
     try {
 
@@ -135,30 +137,22 @@ public class Interpreter {
 
           case PLUS:
             consumeToken.accept(TokenType.PLUS);
-            String number = currentToken.get();
-            consumeToken.accept(TokenType.INTEGER);
-            result += Integer.parseInt(number);
+            result += term.getAsInt();
             break;
 
           case MINUS:
             consumeToken.accept(TokenType.MINUS);
-            number = currentToken.get();
-            consumeToken.accept(TokenType.INTEGER);
-            result -= Integer.parseInt(number);
+            result -=  term.getAsInt();
             break;
 
           case MULTIPLICATION:
             consumeToken.accept(TokenType.MULTIPLICATION);
-            number = currentToken.get();
-            consumeToken.accept(TokenType.INTEGER);
-            result *= Integer.parseInt(number);
+            result *= term.getAsInt();
             break;
 
           case DIVISION:
             consumeToken.accept(TokenType.DIVISION);
-            number = currentToken.get();
-            consumeToken.accept(TokenType.INTEGER);
-            result /= Integer.parseInt(number);
+            result /= term.getAsInt();
             break;
 
         }
