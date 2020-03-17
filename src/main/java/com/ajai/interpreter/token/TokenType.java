@@ -11,7 +11,7 @@ public enum TokenType {
   }
 
   public String getType() {
-    return this.getType();
+    return this.type;
   }
 
   public TokenType getToken(String type) {
