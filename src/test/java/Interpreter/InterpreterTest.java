@@ -8,7 +8,7 @@ import com.ajai.interpreter.Interpreter.InterpreterBuilder;
 class InterpreterTest {
 
   @Test
-  void testValidSingleDigitExpressions() {
+  void testValidExpressions() {
 
     assertEquals(3, new InterpreterBuilder("1+2").build().getResult().getAsInt());
 
@@ -20,15 +20,9 @@ class InterpreterTest {
     
     assertEquals(1, new InterpreterBuilder("10/10").build().getResult().getAsInt());
 
-  }
-
-  @Test
-  void testValidMultipleDigitsExpressions() {
-
     assertEquals(10, new InterpreterBuilder("15-5").build().getResult().getAsInt());
-
+    
     assertEquals(300, new InterpreterBuilder("100+200").build().getResult().getAsInt());
-
   }
 
   @Test
@@ -43,6 +37,8 @@ class InterpreterTest {
     assertEquals(25, new InterpreterBuilder("5*5 + 5 -5").build().getResult().getAsInt());
     
     assertEquals(5, new InterpreterBuilder("5*5 + 5 / 6").build().getResult().getAsInt());
+    
+    assertEquals(4, new InterpreterBuilder("200 / 100 * 2").build().getResult().getAsInt());
   }
 
   @Test
