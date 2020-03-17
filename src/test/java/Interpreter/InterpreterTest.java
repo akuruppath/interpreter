@@ -17,6 +17,8 @@ class InterpreterTest {
     assertEquals(0, new InterpreterBuilder("5-5").build().getResult().getAsInt());
 
     assertEquals(100, new InterpreterBuilder("10*10").build().getResult().getAsInt());
+    
+    assertEquals(1, new InterpreterBuilder("10/10").build().getResult().getAsInt());
 
   }
 
@@ -39,6 +41,8 @@ class InterpreterTest {
     assertEquals(46, new InterpreterBuilder("15 + 5 - 10 + 40 -4").build().getResult().getAsInt());
 
     assertEquals(25, new InterpreterBuilder("5*5 + 5 -5").build().getResult().getAsInt());
+    
+    assertEquals(5, new InterpreterBuilder("5*5 + 5 / 6").build().getResult().getAsInt());
   }
 
   @Test
