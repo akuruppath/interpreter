@@ -1,5 +1,6 @@
 package com.ajai.interpreter;
 
+import static com.ajai.interpreter.operators.Operator.getOperator;
 import static java.lang.Character.isDigit;
 import static java.lang.Character.isWhitespace;
 import static java.text.CharacterIterator.DONE;
@@ -15,7 +16,8 @@ import com.ajai.interpreter.token.TokenType;
 
 public class Interpreter {
 
-  private static final Set<Operator> OPERATOR_SET = EnumSet.of(Operator.PLUS, Operator.MINUS, Operator.MULTIPLICATION, Operator.DIVISION);
+  private static final Set<Operator> OPERATOR_SET =
+      EnumSet.of(Operator.PLUS, Operator.MINUS, Operator.MULTIPLICATION, Operator.DIVISION);
 
   private Token currentToken;
   private StringCharacterIterator charIterator;
@@ -48,7 +50,7 @@ public class Interpreter {
     }
   };
 
-  Supplier<String> numberRepresentation = () -> {
+  private Supplier<String> numberRepresentation = () -> {
 
     StringBuilder builder = new StringBuilder();
 
@@ -60,7 +62,7 @@ public class Interpreter {
     return builder.toString();
   };
 
-  Supplier<Token> nextToken = () -> {
+  private Supplier<Token> nextToken = () -> {
 
     while (charIterator.current() != DONE) {
 
@@ -82,17 +84,17 @@ public class Interpreter {
         charIterator.next();
         return new Token(TokenType.MINUS, Operator.MINUS.getSymbol());
       }
-      
+
       if (charIterator.current() == '*') {
         charIterator.next();
         return new Token(TokenType.MULTIPLICATION, Operator.MULTIPLICATION.getSymbol());
       }
-      
+
       if (charIterator.current() == '/') {
         charIterator.next();
         return new Token(TokenType.DIVISION, Operator.DIVISION.getSymbol());
       }
-      
+
       throw new IllegalStateException("Received unexpected token [" + charIterator.current() + "]");
 
     }
@@ -102,7 +104,7 @@ public class Interpreter {
   };
 
 
-  Consumer<TokenType> consumeToken = type -> {
+  private Consumer<TokenType> consumeToken = type -> {
     if (currentToken.getType() == type) {
       currentToken = nextToken.get();
     } else {
@@ -112,7 +114,7 @@ public class Interpreter {
   };
 
 
-  IntSupplier expressionResult = () -> {
+  private IntSupplier expressionResult = () -> {
 
     currentToken = nextToken.get();
 
@@ -123,38 +125,41 @@ public class Interpreter {
 
     try {
 
-      while (OPERATOR_SET.contains(Operator.getOperator(currentToken.get()))) {
+      while (OPERATOR_SET.contains(getOperator(currentToken.get()))) {
 
-        Operator operator = Operator.getOperator(currentToken.get());
+        Operator operator = getOperator(currentToken.get());
 
-        if (operator == Operator.PLUS) {
-          consumeToken.accept(TokenType.PLUS);
-          String number = currentToken.get();
-          consumeToken.accept(TokenType.INTEGER);
-          result += Integer.parseInt(number);
-        }
+        switch (operator) {
 
-        else if (operator == Operator.MINUS) {
-          consumeToken.accept(TokenType.MINUS);
-          String number = currentToken.get();
-          consumeToken.accept(TokenType.INTEGER);
-          result -= Integer.parseInt(number);
-        }
-        
-        else if (operator == Operator.MULTIPLICATION) {
-          consumeToken.accept(TokenType.MULTIPLICATION);
-          String number = currentToken.get();
-          consumeToken.accept(TokenType.INTEGER);
-          result *= Integer.parseInt(number);
-        }
-        
-        else if (operator == Operator.DIVISION) {
-          consumeToken.accept(TokenType.DIVISION);
-          String number = currentToken.get();
-          consumeToken.accept(TokenType.INTEGER);
-          result /= Integer.parseInt(number);
-        }
+          case PLUS:
+            consumeToken.accept(TokenType.PLUS);
+            String number = currentToken.get();
+            consumeToken.accept(TokenType.INTEGER);
+            result += Integer.parseInt(number);
+            break;
 
+          case MINUS:
+            consumeToken.accept(TokenType.MINUS);
+            number = currentToken.get();
+            consumeToken.accept(TokenType.INTEGER);
+            result -= Integer.parseInt(number);
+            break;
+
+          case MULTIPLICATION:
+            consumeToken.accept(TokenType.MULTIPLICATION);
+            number = currentToken.get();
+            consumeToken.accept(TokenType.INTEGER);
+            result *= Integer.parseInt(number);
+            break;
+
+          case DIVISION:
+            consumeToken.accept(TokenType.DIVISION);
+            number = currentToken.get();
+            consumeToken.accept(TokenType.INTEGER);
+            result /= Integer.parseInt(number);
+            break;
+
+        }
       }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Received unexpected token.", e);
