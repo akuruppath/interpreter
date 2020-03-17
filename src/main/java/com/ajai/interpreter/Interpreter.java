@@ -1,22 +1,24 @@
 package com.ajai.interpreter;
 
-import static java.text.CharacterIterator.DONE;
 import static java.lang.Character.isDigit;
 import static java.lang.Character.isWhitespace;
-
+import static java.text.CharacterIterator.DONE;
 import java.text.StringCharacterIterator;
-import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import com.ajai.interpreter.token.Token;
 import com.ajai.interpreter.token.TokenType;
+import com.google.common.collect.Sets;
 
 public class Interpreter {
 
   private static final String MINUS_OPERATOR = "-";
   private static final String PLUS_OPERATOR = "+";
-  
+
+  private static final Set<String> OPERATOR_SET = Sets.newHashSet(PLUS_OPERATOR, MINUS_OPERATOR);
+
   private Token currentToken;
   private StringCharacterIterator charIterator;
 
@@ -95,7 +97,8 @@ public class Interpreter {
     if (currentToken.getType() == type) {
       currentToken = nextToken.get();
     } else {
-      throw new IllegalStateException("Received unexpected token of type [" + currentToken.getType() + "]");
+      throw new IllegalStateException(
+          "Received unexpected token of type [" + currentToken.getType() + "]");
     }
   };
 
@@ -107,18 +110,34 @@ public class Interpreter {
     String left = currentToken.get();
     consumeToken.accept(TokenType.INTEGER);
 
-    String operator = currentToken.get();
-    consumeToken.accept(Objects.equals(operator, PLUS_OPERATOR) ? TokenType.PLUS : TokenType.MINUS);
+    Integer result = Integer.parseInt(left);
 
-    String right = currentToken.get();
-    consumeToken.accept(TokenType.INTEGER);
+    try {
 
-    Integer leftOperand = Integer.parseInt(left);
-    Integer rightOperand = Integer.parseInt(right);
+      while (OPERATOR_SET.contains(currentToken.get())) {
 
-    return Objects.equals(operator, PLUS_OPERATOR) ? leftOperand + rightOperand
-        : leftOperand - rightOperand;
+        if (currentToken.get().equals(PLUS_OPERATOR)) {
+          consumeToken.accept(TokenType.PLUS);
+          String number = currentToken.get();
+          consumeToken.accept(TokenType.INTEGER);
+          result += Integer.parseInt(number);
+        }
+
+        else if (currentToken.get().equals(MINUS_OPERATOR)) {
+          consumeToken.accept(TokenType.MINUS);
+          String number = currentToken.get();
+          consumeToken.accept(TokenType.INTEGER);
+          result -= Integer.parseInt(number);
+        }
+
+      }
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("Received unexpected token.", e);
+    }
+
+    return result;
   };
+
 
   @FunctionalInterface
   interface WhiteSpaceSkip {
