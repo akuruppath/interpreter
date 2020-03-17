@@ -42,8 +42,7 @@ public class Interpreter {
     }
   }
 
-  SkipWhiteSpace whiteSpaceSkipper = () -> {
-
+  WhiteSpaceSkip skipper = () -> {
     while (charIterator.current() != DONE && isWhitespace(charIterator.current())) {
       charIterator.next();
     }
@@ -66,7 +65,7 @@ public class Interpreter {
     while (charIterator.current() != DONE) {
 
       if (isWhitespace(charIterator.current())) {
-        whiteSpaceSkipper.skip();
+        skipper.skip();
         continue;
       }
 
@@ -122,7 +121,7 @@ public class Interpreter {
   };
 
   @FunctionalInterface
-  interface SkipWhiteSpace {
+  interface WhiteSpaceSkip {
     void skip();
   }
 
