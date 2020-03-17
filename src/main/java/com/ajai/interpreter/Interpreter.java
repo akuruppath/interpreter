@@ -118,18 +118,16 @@ public class Interpreter {
 
     currentToken = nextToken.get();
 
-    String left = currentToken.get();
+    String firstOperand = currentToken.get();
     consumeToken.accept(TokenType.INTEGER);
 
-    Integer result = Integer.parseInt(left);
+    Integer result = Integer.parseInt(firstOperand);
 
     try {
 
       while (OPERATOR_SET.contains(getOperator(currentToken.get()))) {
 
-        Operator operator = getOperator(currentToken.get());
-
-        switch (operator) {
+        switch (getOperator(currentToken.get())) {
 
           case PLUS:
             consumeToken.accept(TokenType.PLUS);
