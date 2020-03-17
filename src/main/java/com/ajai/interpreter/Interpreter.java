@@ -15,7 +15,7 @@ import com.ajai.interpreter.token.TokenType;
 
 public class Interpreter {
 
-  private static final Set<Operator> OPERATOR_SET = EnumSet.of(Operator.PLUS, Operator.MINUS);
+  private static final Set<Operator> OPERATOR_SET = EnumSet.of(Operator.PLUS, Operator.MINUS, Operator.MULTIPLICATION);
 
   private Token currentToken;
   private StringCharacterIterator charIterator;
@@ -82,6 +82,12 @@ public class Interpreter {
         charIterator.next();
         return new Token(TokenType.MINUS, Operator.MINUS.getSymbol());
       }
+      
+      if (charIterator.current() == '*') {
+        charIterator.next();
+        return new Token(TokenType.MULTIPLICATION, Operator.MULTIPLICATION.getSymbol());
+      }
+      
       throw new IllegalStateException("Received unexpected token [" + charIterator.current() + "]");
 
     }
@@ -128,6 +134,13 @@ public class Interpreter {
           String number = currentToken.get();
           consumeToken.accept(TokenType.INTEGER);
           result -= Integer.parseInt(number);
+        }
+        
+        else if (operator == Operator.MULTIPLICATION) {
+          consumeToken.accept(TokenType.MULTIPLICATION);
+          String number = currentToken.get();
+          consumeToken.accept(TokenType.INTEGER);
+          result *= Integer.parseInt(number);
         }
 
       }

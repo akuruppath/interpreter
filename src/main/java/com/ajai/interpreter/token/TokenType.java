@@ -2,7 +2,7 @@ package com.ajai.interpreter.token;
 
 public enum TokenType {
 
-  INTEGER("INTEGER"), PLUS("PLUS"), MINUS("MINUS"), EOF("EOF");
+  INTEGER("INTEGER"), PLUS("PLUS"), MINUS("MINUS"), MULTIPLICATION("MULTIPLY"), EOF("EOF");
 
   private String type;
 

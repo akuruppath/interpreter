@@ -5,9 +5,9 @@ import com.google.common.collect.ImmutableMap;
 
 public enum Operator {
 
-  PLUS("+"), MINUS("-");
+  PLUS("+"), MINUS("-"), MULTIPLICATION("*");
 
-  private static final Map<String, Operator> OPERATOR_MAP = ImmutableMap.of("+", PLUS, "-", MINUS);
+  private static final Map<String, Operator> OPERATOR_MAP = ImmutableMap.of("+", PLUS, "-", MINUS, "*", MULTIPLICATION);
 
   private String operator;
 
